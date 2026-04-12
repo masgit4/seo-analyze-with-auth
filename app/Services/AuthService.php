@@ -28,8 +28,8 @@ class AuthService
                 'different:current_password',
             ],
         ], [
-            'password.regex' => 'Password baru harus mengandung huruf kecil, huruf besar, dan angka.',
-            'password.different' => 'Password baru harus berbeda dari password lama.',
+            'password.regex' => 'New password must contain lowercase letters, uppercase letters, and numbers.',
+            'password.different' => 'New password must be different from old password.',
         ]);
 
         $has = Hash::check($validated['current_password'], $user->password);
@@ -64,7 +64,7 @@ class AuthService
                 'min:8',
                 'max:20',
                 'alpha_dash',
-                'not_in:auth,me,signin,signup,signout,dashboard,admin,profile,editprofile,changepassword',
+                'not_in:seo,auth,me,signin,signup,signout,dashboard,admin,profile,editprofile,changepassword',
                 Rule::unique('users', 'username')->ignore($user->id),
             ],
             'email' => [
@@ -100,7 +100,7 @@ class AuthService
                 'max:20',
                 'alpha_dash',
                 'unique:users,username',
-                'not_in:auth,me,signin,signup,signout,dashboard,admin,profile,editprofile,changepassword',
+                'not_in:seo,auth,me,signin,signup,signout,dashboard,admin,profile,editprofile,changepassword',
             ],
             'email' => ['required', 'email', 'max:100', 'unique:users,email'],
             'password' => [
@@ -111,9 +111,9 @@ class AuthService
                 'confirmed',
             ],
         ], [
-            'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, strip, dan underscore.',
-            'username.min' => 'Username minimal 6 karakter.',
-            'password.regex' => 'Password harus mengandung huruf kecil, huruf besar, dan angka.',
+            'username.alpha_dash' => 'Username may only contain letters, numbers, dashes and underscores.',
+            'username.min' => 'Username must be at least 6 characters.',
+            'password.regex' => 'Password must contain lowercase letters, uppercase letters, and numbers.',
         ]);
 
         return User::create([
@@ -146,7 +146,7 @@ class AuthService
             RateLimiter::hit($this->throttleKey($request, $loginInput), 60);
 
             throw ValidationException::withMessages([
-                'login' => ['Login atau password salah.'],
+                'login' => ['Wrong email, username or password.'],
             ]);
         }
 
@@ -156,7 +156,7 @@ class AuthService
 
         if (!$user) {
             throw ValidationException::withMessages([
-                'login' => ['User tidak ditemukan.'],
+                'login' => ['User not found.'],
             ]);
         }
 
@@ -174,7 +174,7 @@ class AuthService
         $seconds = RateLimiter::availableIn($this->throttleKey($request, $loginInput));
 
         throw ValidationException::withMessage([
-            'login' => ["Terlalu banyak percobaan login. Coba lagi dalam {$seconds} detik"],
+            'login' => ["Too many login attempts. Please try again in {$seconds} seconds."],
         ]);
     }
 
