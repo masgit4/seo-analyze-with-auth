@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    {{ route('home') }}
+    {{ secure_route('home') }}
     <bt />
     {{ config('app.url') }}
     <h2>Selamat Datang</h2>
