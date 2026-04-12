@@ -3,7 +3,7 @@
 @section('content')
     <h2>Sign Up</h2>
 
-    <form action="{{ route('register.post') }}" method="POST">
+    <form action="/auth/signup" method="POST">
         @csrf
 
         <label>Nama</label>
