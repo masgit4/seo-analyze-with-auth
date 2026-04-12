@@ -148,6 +148,28 @@ class SeoController extends Controller
         return view('result', compact('analysis', 'withId'));
     }
 
+    public function analyzeApi(Request $request)
+    {
+        $user = $request->user();
+
+        $url = $request->url;
+        $html = @file_get_contents($url);
+    
+        preg_match('/<title>(.*?)<\/title>/', $html, $title);
+    
+        $analysis = Analysis::create([
+            'user_id' => $user->id,
+            'url' => $url,
+            'title' => $title[1] ?? null,
+            'score' => rand(60, 100),
+        ]);
+    
+        return response()->json([
+            'status' => true,
+            'data' => $analysis
+        ]);
+    }
+
     public function history(Request $request)
     {
         $search = $request->search;
