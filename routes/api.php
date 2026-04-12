@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SeoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -28,6 +29,7 @@ Route::prefix('auth')->group(function () {
 Route::get('/profile/{username}', [DashboardController::class, 'apiOnlyUserProfile']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/analyze', [SeoController::class, 'analyzeId']);
     Route::post('/auth/signout', [LogoutController::class, 'storeOnce']);
 
     Route::get('/me', [DashboardController::class, 'apiProfile']);
