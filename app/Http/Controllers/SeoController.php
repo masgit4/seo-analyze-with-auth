@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DOMDocument;
 use Illuminate\Http\Request;
 use App\Models\Analysis;
 use App\Helpers\SeoHelper;
@@ -17,7 +18,7 @@ class SeoController extends Controller
             ->wheredate('created_at', today())->count();
 
         if ($count >= $user->limit) {
-            return back()->with('error', 'Limit harian tercapai (' . $user->limit . 'x)');
+            return back()->with('error', 'Daily limit reached (' . $user->limit . 'x)');
         }
 
         $request->validate([
@@ -30,18 +31,16 @@ class SeoController extends Controller
         $html = @file_get_contents($url);
 
         if (!$html) {
-            return back()->with('error', 'Website tidak bisa diakses');
+            return back()->with('error', 'The website cannot be accessed');
         }
 
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
         $dom->loadHTML($html);
 
-        // TITLE
         $titleNode = $dom->getElementsByTagName("title")->item(0);
         $title = $titleNode ? $titleNode->nodeValue : '';
 
-        // META & OG
         $desc = '';
         $og = false;
 
@@ -54,11 +53,9 @@ class SeoController extends Controller
             }
         }
 
-        // HEADINGS
         $h1 = $dom->getElementsByTagName("h1")->length;
         $h2 = $dom->getElementsByTagName("h2")->length;
 
-        // IMAGES
         $img_no_alt = 0;
         foreach ($dom->getElementsByTagName("img") as $img) {
             if (!$img->hasAttribute("alt") || $img->getAttribute("alt") === '') {
@@ -66,7 +63,6 @@ class SeoController extends Controller
             }
         }
 
-        // LINKS
         $internal = 0;
         $external = 0;
         $host = parse_url($url, PHP_URL_HOST);
@@ -81,7 +77,6 @@ class SeoController extends Controller
             }
         }
 
-        // CANONICAL
         $canonical = false;
         foreach ($dom->getElementsByTagName("link") as $link) {
             if ($link->getAttribute("rel") === "canonical") {
@@ -89,15 +84,12 @@ class SeoController extends Controller
             }
         }
 
-        // TECHNICAL
         $https = SeoHelper::checkHttps($url);
         $sitemap = SeoHelper::checkSitemap($url);
         $robots = SeoHelper::checkRobots($url);
 
-        // KEYWORD
         $density = SeoHelper::keywordDensity($html, $keyword);
 
-        // SCORE
         $score = 0;
         if ($title && strlen($title) <= 60) $score += 15;
         if ($desc && strlen($desc) <= 160) $score += 15;
@@ -142,7 +134,18 @@ class SeoController extends Controller
             'keyword_density' => $density
         ]);
 
-        return view('result', compact('analysis', 'recommendations'));
+        $withId = false;
+
+        return view('result', compact('analysis', 'recommendations', 'withId'));
+    }
+
+    public function analyzeId(Request $request, $id)
+    {
+        $analysis = Analysis::findOrFail($id);
+
+        $withId = true;
+
+        return view('result', compact('analysis', 'withId'));
     }
 
     public function history(Request $request)
@@ -167,7 +170,6 @@ class SeoController extends Controller
     {
         $rec = [];
     
-        // TITLE
         if (!$data['title']) {
             $rec[] = ['status' => 'bad', 'text' => 'Title tidak ditemukan'];
         } elseif (strlen($data['title']) > 60) {
@@ -176,7 +178,6 @@ class SeoController extends Controller
             $rec[] = ['status' => 'good', 'text' => 'Title sudah optimal'];
         }
     
-        // META DESCRIPTION
         if (!$data['description']) {
             $rec[] = ['status' => 'bad', 'text' => 'Meta description tidak ditemukan'];
         } elseif (strlen($data['description']) > 160) {
@@ -185,7 +186,6 @@ class SeoController extends Controller
             $rec[] = ['status' => 'good', 'text' => 'Meta description sudah optimal'];
         }
     
-        // H1
         if ($data['h1'] == 0) {
             $rec[] = ['status' => 'bad', 'text' => 'Tidak ada H1'];
         } elseif ($data['h1'] > 1) {
@@ -194,49 +194,42 @@ class SeoController extends Controller
             $rec[] = ['status' => 'good', 'text' => 'H1 sudah baik'];
         }
     
-        // IMAGE ALT
         if ($data['img_no_alt'] > 0) {
             $rec[] = ['status' => 'warning', 'text' => 'Ada gambar tanpa ALT'];
         } else {
             $rec[] = ['status' => 'good', 'text' => 'Semua gambar memiliki ALT'];
         }
     
-        // HTTPS
         if (!$data['https']) {
             $rec[] = ['status' => 'bad', 'text' => 'Website belum menggunakan HTTPS'];
         } else {
             $rec[] = ['status' => 'good', 'text' => 'HTTPS aktif'];
         }
     
-        // SITEMAP
         if (!$data['sitemap']) {
             $rec[] = ['status' => 'warning', 'text' => 'Sitemap tidak ditemukan'];
         } else {
             $rec[] = ['status' => 'good', 'text' => 'Sitemap tersedia'];
         }
     
-        // ROBOTS
         if (!$data['robots']) {
             $rec[] = ['status' => 'warning', 'text' => 'Robots.txt tidak ditemukan'];
         } else {
             $rec[] = ['status' => 'good', 'text' => 'Robots.txt tersedia'];
         }
     
-        // CANONICAL
         if (!$data['canonical']) {
             $rec[] = ['status' => 'warning', 'text' => 'Canonical tag tidak ditemukan'];
         } else {
             $rec[] = ['status' => 'good', 'text' => 'Canonical sudah ada'];
         }
     
-        // OPEN GRAPH
         if (!$data['og_tags']) {
             $rec[] = ['status' => 'warning', 'text' => 'Open Graph tidak ditemukan'];
         } else {
             $rec[] = ['status' => 'good', 'text' => 'Open Graph tersedia'];
         }
     
-        // KEYWORD DENSITY
         if ($data['keyword_density'] == 0) {
             $rec[] = ['status' => 'warning', 'text' => 'Keyword tidak ditemukan di halaman'];
         } elseif ($data['keyword_density'] > 3) {
@@ -252,7 +245,6 @@ class SeoController extends Controller
     {
         $analysis = \App\Models\Analysis::findOrFail($id);
     
-        // generate ulang recommendation
         $recommendations = $this->generateRecommendations([
             'title' => $analysis->title,
             'description' => $analysis->description,
@@ -267,7 +259,7 @@ class SeoController extends Controller
         ]);
     
         $pdf = Pdf::loadView('pdf.report', compact('analysis', 'recommendations'));
-    
+
         return $pdf->download('seo-report.pdf');
     }
 
