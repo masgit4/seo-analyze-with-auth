@@ -81,7 +81,7 @@
         </div>
 
         <div style="margin-top: 20px;">
-            <a href="{{ route('profile.show', auth()->user()->username) }}">
+            <a href="{{ secure_route('profile.show', auth()->user()->username) }}">
                 <button
                     type="submit"
                     class="w-full bg-blue-500 hover:bg-blue-600 p-3 rounded-lg font-semibold transition"
@@ -91,7 +91,7 @@
             </a>
         </div>
 
-        <form action="{{ route('logout') }}" method="POST" style="margin-top: 20px;">
+        <form action="{{ secure_route('logout') }}" method="POST" style="margin-top: 20px;">
             @csrf
             <button
                 type="submit"

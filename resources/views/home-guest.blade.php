@@ -11,10 +11,10 @@
     </p>
 
     <div style="margin-bottom: 15px;">
-        <a href="{{ route('login') }}">Sign In</a>
+        <a href="{{ secure_route('login') }}">Sign In</a>
     </div>
 
     <div>
-        <a href="{{ route('register') }}">Sign Up</a>
+        <a href="{{ secure_route('register') }}">Sign Up</a>
     </div>
 @endsection

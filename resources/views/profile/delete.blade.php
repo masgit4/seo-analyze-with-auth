@@ -4,14 +4,14 @@
     <h2>Delete Account</h2>
 
     <div style="margin-bottom: 20px;">
-        <a href="{{ route('profile.show', $user->username) }}">← Kembali ke Profile</a>
+        <a href="{{ secure_route('profile.show', $user->username) }}">← Kembali ke Profile</a>
     </div>
 
     <div class="alert-error" style="margin-bottom: 20px;">
         <strong>Peringatan:</strong> akun yang sudah dihapus tidak bisa dikembalikan.
     </div>
 
-    <form action="{{ route('profile.delete', $user->username) }}" method="POST">
+    <form action="{{ secure_route('profile.delete', $user->username) }}" method="POST">
         @csrf
         @method('DELETE')
 

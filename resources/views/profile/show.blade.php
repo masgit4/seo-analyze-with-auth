@@ -10,15 +10,15 @@
     @auth
         @if(auth()->user()->id === $user->id)
             <div style="margin-top: 20px;">
-                <a href="{{ route('profile.edit', $user->username) }}">Edit Profile</a>
+                <a href="{{ secure_route('profile.edit', $user->username) }}">Edit Profile</a>
             </div>
 
             <div style="margin-top: 12px;">
-                <a href="{{ route('profile.password.edit', $user->username) }}">Ganti Password</a>
+                <a href="{{ secure_route('profile.password.edit', $user->username) }}">Ganti Password</a>
             </div>
 
             <div style="margin-top: 12px;">
-                <a href="{{ route('profile.delete.form', $user->username) }}" class="btn-danger-link">Delete Account</a>
+                <a href="{{ secure_route('profile.delete.form', $user->username) }}" class="btn-danger-link">Delete Account</a>
             </div>
         @endif
     @endauth

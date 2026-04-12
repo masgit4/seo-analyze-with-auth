@@ -4,10 +4,10 @@
     <h2>Ganti Password</h2>
 
     <div style="margin-bottom: 20px;">
-        <a href="{{ route('profile.show', $user->username) }}">← Kembali ke Profile</a>
+        <a href="{{ secure_route('profile.show', $user->username) }}">← Kembali ke Profile</a>
     </div>
 
-    <form action="{{ route('profile.password.update', $user->username) }}" method="POST">
+    <form action="{{ secure_route('profile.password.update', $user->username) }}" method="POST">
         @csrf
         @method('PUT')
 

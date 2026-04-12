@@ -8,10 +8,10 @@
     <p>Email: {{ auth()->user()->email }}</p>
 
     <div style="margin-top: 20px;">
-        <a href="{{ route('profile.show', auth()->user()->username) }}">Lihat Profile</a>
+        <a href="{{ secure_route('profile.show', auth()->user()->username) }}">Lihat Profile</a>
     </div>
 
-    <form action="{{ route('logout') }}" method="POST" style="margin-top: 20px;">
+    <form action="{{ secure_route('logout') }}" method="POST" style="margin-top: 20px;">
         @csrf
         <button type="submit">Sign Out</button>
     </form>

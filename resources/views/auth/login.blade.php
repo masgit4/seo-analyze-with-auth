@@ -3,7 +3,7 @@
 @section('content')
     <h2>Sign In</h2>
 
-    <form action="/auth/signin" method="POST">
+    <form action="{{ secure_route('login.post') }}" method="POST">
         @csrf
 
         <label>Email atau Username</label>
@@ -17,6 +17,6 @@
 
     <p style="margin-top: 16px; text-align:center;">
         Belum punya akun?
-        <a href="{{ route('register') }}" style="background:none; color:#0d6efd; padding:0; width:auto;">Sign Up</a>
+        <a href="{{ secure_route('register') }}" style="background:none; color:#0d6efd; padding:0; width:auto;">Sign Up</a>
     </p>
 @endsection

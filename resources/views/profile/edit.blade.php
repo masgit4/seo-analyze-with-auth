@@ -4,10 +4,10 @@
     <h2>Edit Profile</h2>
 
     <div style="margin-bottom: 20px;">
-        <a href="{{ route('profile.show', $user->username) }}">← Kembali ke Profile</a>
+        <a href="{{ secure_route('profile.show', $user->username) }}">← Kembali ke Profile</a>
     </div>
 
-    <form action="{{ route('profile.update', $user->username) }}" method="POST">
+    <form action="{{ secure_route('profile.update', $user->username) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -25,6 +25,6 @@
     </form>
 
     <div style="margin-top: 20px;">
-        <a href="{{ route('profile.password.edit', $user->username) }}">Ganti Password</a>
+        <a href="{{ secure_route('profile.password.edit', $user->username) }}">Ganti Password</a>
     </div>
 @endsection
