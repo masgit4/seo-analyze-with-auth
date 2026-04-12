@@ -33,19 +33,20 @@ Route::prefix('auth')->middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::post('/analyze', [SeoController::class, 'analyze'])->middleware('check.limit');
-    Route::get('/history', [SeoController::class, 'history']);
-    Route::delete('/history/{id}', [SeoController::class, 'delete']);
-    Route::get('/analysis/{id}', function ($id) {
-        $analysis = Analysis::findOrFail($id);
-    
-        return view('result', compact('analysis'));
+    Route::prefix('seo')->group(function () {
+        Route::get('/history', [SeoController::class, 'history'])->name('history');
+
+        Route::delete('/history/{id}', [SeoController::class, 'delete'])->name('history.delete');
+
+        Route::post('/analyze', [SeoController::class, 'analyze'])->middleware('check.limit')
+            ->name('analysis');
+
+        Route::get('/analysis/{id}', [SeoController::class, 'analyzeId'])->name('analysis.id');
     });
 
-    Route::get('/export/{id}', [SeoController::class, 'exportPdf']);
+    Route::get('/export/{id}', [SeoController::class, 'exportPdf'])->name('export.pdf');
     Route::post('/auth/signout', [LogoutController::class, 'storeWithSession'])->name('logout');
 
-    // Edit profile hanya milik user yang login
     Route::get('/{username}/editprofile', [UpdateWithoutPasswordController::class, 'form'])
         ->name('profile.edit');
 
