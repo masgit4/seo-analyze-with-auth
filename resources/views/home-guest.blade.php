@@ -1,9 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    {{ secure_route('home') }}
-    <bt />
-    {{ config('app.url') }}
     <h2>Selamat Datang</h2>
 
     <p style="text-align:center; margin-bottom: 25px;">
