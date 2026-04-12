@@ -16,10 +16,10 @@ class DashboardController extends Controller
 
             $remaining = auth()->user()->limit - $used;
 
-            return view('dashboard', compact('remaining'));
+            return view('dashboard-auth', compact('remaining'));
         }
 
-        return view('home-guest');
+        return view('dashboard-guest');
 
     }
 
