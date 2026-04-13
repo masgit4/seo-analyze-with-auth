@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SeoController;
@@ -23,17 +24,26 @@ use App\Http\Controllers\Profile\UpdateWithoutPasswordController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/signup', [RegisterController::class, 'storeOnce']);
+
     Route::post('/signin', [LoginController::class, 'storeOnce']);
 });
 
 Route::get('/profile/{username}', [DashboardController::class, 'apiOnlyUserProfile']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/analyze', [SeoController::class, 'analyzeId']);
+    Route::post('/analyze', [SeoController::class, 'analyzeApi']);
+
+    Route::get('/history', function (Request $request) {
+        return $request->user()->analyses()->latest()->get();
+    });
+
     Route::post('/auth/signout', [LogoutController::class, 'storeOnce']);
 
     Route::get('/me', [DashboardController::class, 'apiProfile']);
+
     Route::put('/me/profile', [UpdateWithoutPasswordController::class, 'storeOnce']);
+
     Route::put('/me/password', [UpdateOnlyPasswordController::class, 'storeOnce']);
+
     Route::delete('/me/account', [DeleteController::class, 'storeOnce']);
 });
